@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AnswerDto } from './dto/app.dto';
 
@@ -7,8 +7,12 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getHello(@Req() request,@Res() response) {
+    // console.log(request.headers)
+    // return this.appService.getHello();
+    response.status(200).json({
+      response: this.appService.getHello()
+    })
   }
 
   @Get('/askquestion')
@@ -17,9 +21,22 @@ export class AppController {
   }
 
   @Post('/answer')
-  answer(@Body() getAnswerDto : AnswerDto){
-    return {
-      answer : getAnswerDto.answer
+  answer(
+    @Body() getAnswerDto : AnswerDto,
+    @Req() request,
+    @Res() response 
+  ){
+    let res;
+    let status;
+    if(request.body.answer == 'yes'){
+      res = "It is yes"
+      status = 200
+   } else{
+      res = "It is no"
+      status = 400
     }
+    response.status(status).json({
+      response : res
+    })
   }
 }
